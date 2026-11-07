@@ -101,6 +101,7 @@ body {
   height: auto;
   border-radius: 8px;
   transform: translateX(-50%);
+  transform-origin: center center;
   filter: url(#cut-black-png);
 }
 
@@ -144,9 +145,15 @@ body {
 }
 
 .ad.is-started .cta {
+  opacity: 1;
+  transition: scale 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
   animation:
     cta-in 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) 4.1s both,
     cta-pulse 4s ease-in-out 6s 6;
+}
+
+.ad.is-started:hover .cta {
+  scale: 1.06;
 }
 
 .top .content {
@@ -252,5 +259,9 @@ body {
 
   .cta {
     transform: translateX(-50%);
+  }
+
+  .ad.is-started .cta {
+    transition: none;
   }
 }
