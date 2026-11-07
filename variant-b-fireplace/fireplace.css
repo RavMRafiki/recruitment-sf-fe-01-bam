@@ -1,0 +1,225 @@
+:root {
+  color-scheme: dark;
+  --intro: 5.4s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #202020;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.ad {
+  position: relative;
+  width: var(--width);
+  height: var(--height);
+  overflow: hidden;
+  cursor: pointer;
+  isolation: isolate;
+  background-color: #202020;
+}
+
+.layer {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.background {
+  z-index: 0;
+  width: 1680px;
+  height: 975px;
+  max-width: none;
+  transform-origin: center;
+  background-image: url("assets/bg-big.jpg");
+  background-repeat: no-repeat;
+  background-size: 1680px 975px;
+}
+
+.top .background {
+  left: -320px;
+  top: 0;
+}
+
+.left .background {
+  left: 0;
+  top: 0;
+}
+
+.right .background {
+  left: -1360px;
+  top: 0;
+}
+
+.overlay {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  z-index: 1;
+}
+
+.logo {
+  z-index: 2;
+}
+
+.content {
+  z-index: 3;
+}
+
+.content:not(.box) {
+  mix-blend-mode: screen;
+}
+
+.box {
+  clip-path: inset(74.5% 0 6.4%);
+}
+
+.cta {
+  z-index: 4;
+  left: 50%;
+  width: 172.5px;
+  height: 46.5px;
+  transform: translateX(-50%);
+}
+
+.left .cta,
+.right .cta {
+  bottom: 35px;
+}
+
+.left .content,
+.right .content {
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+.top .content {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.logo {
+  opacity: 0;
+  transform: scale(.86);
+  transform-origin: center;
+}
+
+.ad.is-started .background {
+  animation: background-life 30s ease-in-out var(--intro) both;
+}
+
+.ad.is-started .logo {
+  animation: logo-in 1s cubic-bezier(.2, .8, .2, 1) .65s both;
+}
+
+.ad.is-started .content {
+  animation: content-in 1.1s cubic-bezier(.2, .8, .2, 1) 2.3s both;
+}
+
+.ad.is-started .cta {
+  animation:
+    cta-in .85s cubic-bezier(.2, .8, .2, 1) 4.1s both,
+    cta-pulse 4s ease-in-out 6s 6;
+}
+
+.top .content {
+  animation-delay: 1.1s;
+}
+
+.top .background {
+  animation-delay: 0s;
+}
+
+@keyframes logo-in {
+  from {
+    opacity: 0;
+    transform: scale(.86);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes content-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cta-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px) scale(.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes cta-pulse {
+  0%, 75%, 100% {
+    transform: translate(-50%, 0) scale(1);
+  }
+  82% {
+    transform: translate(-50%, 0) scale(1.035);
+  }
+  88% {
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes background-life {
+  0% {
+    transform: scale(1);
+  }
+  18% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1.04) translate3d(0, -3px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad,
+  .ad.is-started .background,
+  .ad.is-started .logo,
+  .ad.is-started .content,
+  .ad.is-started .cta {
+    animation: none;
+    transition: none;
+  }
+
+  .background,
+  .logo,
+  .content,
+  .cta {
+    opacity: 1;
+    transform: none;
+  }
+
+  .cta {
+    transform: translateX(-50%);
+  }
+}
