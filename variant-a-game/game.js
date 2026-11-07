@@ -1,22 +1,36 @@
 /* global Phaser */
 (() => {
-  'use strict';
+  "use strict";
 
   const W = 360;
   const H = 640;
   const PLAY_TOP = 58;
-  const PLAY_BOTTOM = 640;
+  const PLAYFIELD_TOP = 220;
+  const PLAY_BOTTOM = 600;
   const PLAYER_X = 82;
-  const ASSET = 'assets/';
+  const ASSET = "assets/";
   const obstacleNames = [
-    'bac1', 'txt1', 'bac2', 'txt2', 'bac3', 'txt3', 'bac4',
-    'txt4', 'bac5', 'txt5', 'bac6', 'txt6', 'txt7', 'txt8', 'txt9'
+    "bac1",
+    "txt1",
+    "bac2",
+    "txt2",
+    "bac3",
+    "txt3",
+    "bac4",
+    "txt4",
+    "bac5",
+    "txt5",
+    "bac6",
+    "txt6",
+    "txt7",
+    "txt8",
+    "txt9",
   ];
 
   class GutRun extends Phaser.Scene {
     constructor() {
-      super('GutRun');
-      this.mode = 'start';
+      super("GutRun");
+      this.mode = "start";
       this.obstacles = [];
       this.audio = {};
       this.soundOn = true;
@@ -24,141 +38,222 @@
     }
 
     preload() {
-      this.load.image('bg', `${ASSET}bg.jpg`);
-      this.load.image('border', `${ASSET}border.png`);
-      this.load.image('logo', `${ASSET}logo.png`);
-      this.load.image('gesture', `${ASSET}gesture.png`);
-      this.load.image('gameplay', `${ASSET}01_game/gameplay.png`);
-      this.load.image('texture', `${ASSET}01_game/bg_texture.png`);
-      this.load.image('player', `${ASSET}01_game/player.png`);
-      this.load.image('tut', `${ASSET}01_game/tut.png`);
+      this.load.image("bg", `${ASSET}bg.jpg`);
+      this.load.image("border", `${ASSET}border.png`);
+      this.load.image("logo", `${ASSET}logo.png`);
+      this.load.image("gesture", `${ASSET}gesture.png`);
+      this.load.image("gameplay", `${ASSET}01_game/gameplay.png`);
+      this.load.image("texture", `${ASSET}01_game/bg_texture.png`);
+      this.load.image("player", `${ASSET}01_game/player.png`);
+      this.load.image("tut", `${ASSET}01_game/tut.png`);
       obstacleNames.forEach((name) => {
-        const folder = name.startsWith('bac') ? '01_game' : '01_game';
+        const folder = name.startsWith("bac") ? "01_game" : "01_game";
         this.load.image(name, `${ASSET}${folder}/${name}.png`);
       });
-      ['fail-bubble', 'fail-cta', 'fail-hl', 'fail-replay', 'fail-sad',
-        'fail-bac1', 'fail-bac2', 'fail-bac3', 'fail-bac4', 'fail-bac5',
-        'win-bubble', 'win-cta', 'win-happy', 'win-hl', 'win-konfetti'
+      [
+        "fail-bubble",
+        "fail-cta",
+        "fail-hl",
+        "fail-replay",
+        "fail-sad",
+        "fail-bac1",
+        "fail-bac2",
+        "fail-bac3",
+        "fail-bac4",
+        "fail-bac5",
+        "win-bubble",
+        "win-cta",
+        "win-happy",
+        "win-hl",
+        "win-konfetti",
       ].forEach((key) => {
-        const [card, file] = key.split('-').length > 2
-          ? [key.split('-')[0], key.substring(key.indexOf('-') + 1)]
-          : [key.split('-')[0], key.substring(key.indexOf('-') + 1)];
+        const [card, file] =
+          key.split("-").length > 2
+            ? [key.split("-")[0], key.substring(key.indexOf("-") + 1)]
+            : [key.split("-")[0], key.substring(key.indexOf("-") + 1)];
         this.load.image(key, `${ASSET}02_endcard/${card}/${file}.png`);
       });
-      this.load.audio('loop', `${ASSET}music/background_music/Funny Game Loop.mp3`);
-      this.load.audio('crash', `${ASSET}music/crash/Cartoon Crash Boing.mp3`);
-      this.load.audio('fail', `${ASSET}music/endcard_fail/Fail.mp3`);
-      this.load.audio('win', `${ASSET}music/endcard_win/Celebrative Happy Woohoo Cheer 2.mp3`);
-      this.load.audio('applause', `${ASSET}music/endcard_win/applause.mp3`);
+      this.load.audio(
+        "loop",
+        `${ASSET}music/background_music/Funny Game Loop.mp3`,
+      );
+      this.load.audio("crash", `${ASSET}music/crash/Cartoon Crash Boing.mp3`);
+      this.load.audio("fail", `${ASSET}music/endcard_fail/Fail.mp3`);
+      this.load.audio(
+        "win",
+        `${ASSET}music/endcard_win/Celebrative Happy Woohoo Cheer 2.mp3`,
+      );
+      this.load.audio("applause", `${ASSET}music/endcard_win/applause.mp3`);
     }
 
     create() {
       this.input.addPointer(1);
-      this.input.on('pointerdown', this.handleTap, this);
-      document.addEventListener('visibilitychange', () => this.handleVisibility(), { passive: true });
-      document.getElementById('mute').addEventListener('click', (event) => {
+      this.input.on("pointerdown", this.handleTap, this);
+      document.addEventListener(
+        "visibilitychange",
+        () => this.handleVisibility(),
+        { passive: true },
+      );
+      document.getElementById("mute").addEventListener("click", (event) => {
         event.stopPropagation();
         this.soundOn = !this.soundOn;
         this.sound.mute = !this.soundOn;
-        event.currentTarget.textContent = this.soundOn ? '🔊' : '🔇';
-        event.currentTarget.classList.toggle('is-muted', !this.soundOn);
+        event.currentTarget.textContent = this.soundOn ? "🔊" : "🔇";
+        event.currentTarget.classList.toggle("is-muted", !this.soundOn);
       });
       this.showStart();
     }
 
     addFull(key, depth = 0) {
-      return this.add.image(W / 2, H / 2, key).setDisplaySize(W, H).setDepth(depth);
+      return this.add
+        .image(W / 2, H / 2, key)
+        .setDisplaySize(W, H)
+        .setDepth(depth);
     }
 
     addHalf(key, x, y, depth = 0) {
       const source = this.textures.get(key).getSourceImage();
-      return this.add.image(x, y, key)
+      return this.add
+        .image(x, y, key)
         .setDisplaySize(source.width / 2, source.height / 2)
         .setDepth(depth);
     }
 
     showStart() {
       this.clearStage();
-      this.mode = 'start';
-      this.addFull('bg');
-      this.add.rectangle(W / 2, 0, W, PLAY_TOP, 0xffffff).setOrigin(.5, 0).setDepth(1);
-      this.addFull('logo', 2);
-      this.add.rectangle(W / 2, 58, W, 1, 0x091d4c).setOrigin(.5, 0).setDepth(2);
-      this.add.image(0, PLAY_TOP, 'gameplay').setOrigin(0, 0).setDisplaySize(2528, 640).setDepth(0);
-      this.addFull('texture', 1);
-      this.addFull('border', 4);
-      this.addFull('tut', 5);
-      this.add.image(W / 2, 505, 'gesture').setDisplaySize(180, 160).setDepth(6);
-      this.tweens.add({ targets: this.children.list.slice(-2), alpha: 0.35, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      this.mode = "start";
+      this.addFull("bg");
+      this.add
+        .rectangle(W / 2, 0, W, PLAY_TOP, 0xffffff)
+        .setOrigin(0.5, 0)
+        .setDepth(1);
+      this.addFull("logo", 2);
+      this.add
+        .rectangle(W / 2, 58, W, 1, 0x091d4c)
+        .setOrigin(0.5, 0)
+        .setDepth(2);
+      this.add
+        .image(0, PLAY_TOP, "gameplay")
+        .setOrigin(0, 0)
+        .setDisplaySize(2528, 640)
+        .setDepth(0);
+      this.addFull("texture", 1);
+      this.addFull("border", 4);
+      this.addFull("tut", 5);
+      this.add.image(76, 280, "player").setScale(0.5).setDepth(6);
+      [
+        ["bac6", 109, 348],
+        ["bac2", 289, 367],
+        ["txt1", 108, 418],
+        ["txt2", 321, 448],
+      ].forEach(([key, x, y]) => {
+        this.add.image(x, y, key).setScale(0.5).setDepth(6);
+      });
+      const gesture = this.add
+        .image(190, 500, "gesture")
+        .setScale(0.5)
+        .setDepth(6);
+      this.tweens.add({
+        targets: gesture,
+        scale: 0.54,
+        duration: 700,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.inOut",
+      });
     }
 
     handleTap(pointer) {
       if (this.pausedByVisibility || !pointer) return;
-      if (this.mode === 'start') {
+      if (this.mode === "start") {
         this.startGame();
-      } else if (this.mode === 'playing') {
+      } else if (this.mode === "playing") {
         this.jump();
-      } else if (this.mode === 'fail' && pointer.y > 530) {
+      } else if (this.mode === "fail" && pointer.y > 530) {
         this.startGame();
-      } else if (this.mode === 'fail' || this.mode === 'win') {
+      } else if (this.mode === "fail" || this.mode === "win") {
         this.clickout();
       }
     }
 
     startGame() {
       this.clearStage();
-      this.mode = 'playing';
+      this.mode = "playing";
       this.score = 0;
       this.playerY = 350;
       this.velocity = 0;
       this.obstacles = [];
-      this.addFull('bg');
-      this.gut = this.add.image(0, PLAY_TOP, 'gameplay').setOrigin(0, 0).setDisplaySize(2528, 640);
-      this.texture = this.add.image(0, PLAY_TOP, 'texture').setOrigin(0, 0).setDisplaySize(W, 640).setDepth(1);
-      this.addFull('logo', 2);
-      this.addFull('tut', 5);
-      this.player = this.add.image(PLAYER_X, this.playerY, 'player').setDisplaySize(42, 41).setDepth(4);
-      this.addFull('border', 6);
+      this.addFull("bg");
+      this.gut = this.add
+        .image(0, PLAY_TOP, "gameplay")
+        .setOrigin(0, 0)
+        .setDisplaySize(2528, 640);
+      this.texture = this.add
+        .image(0, PLAY_TOP, "texture")
+        .setOrigin(0, 0)
+        .setDisplaySize(W, 640)
+        .setDepth(1);
+      this.addFull("logo", 2);
+      this.addFull("tut", 5);
+      this.player = this.add
+        .image(PLAYER_X, this.playerY, "player")
+        .setDisplaySize(42, 41)
+        .setDepth(4);
+      this.addFull("border", 6);
       this.makeObstacles();
-      this.audio.loop = this.sound.add('loop', { loop: true, volume: .22 });
-      this.playSound('loop');
+      this.audio.loop = this.sound.add("loop", { loop: true, volume: 0.22 });
+      this.playSound("loop");
       this.gameStart = this.time.now;
     }
 
     makeObstacles() {
       const gap = 235;
       obstacleNames.forEach((name, index) => {
-        const image = this.add.image(W + 70 + index * gap, PLAY_TOP + 100 + (index % 4) * 112, name)
-          .setOrigin(.5).setDepth(3);
+        const image = this.add
+          .image(W + 70 + index * gap, 0, name)
+          .setOrigin(0.5)
+          .setDepth(3);
         const source = this.textures.get(name).getSourceImage();
-        const scale = name.startsWith('txt') ? 0.5 : 0.52;
+        const scale = name.startsWith("txt") ? 0.5 : 0.52;
         image.setDisplaySize(source.width * scale, source.height * scale);
-        this.obstacles.push({ image, passed: false, hitScale: name.startsWith('txt') ? .32 : .58 });
+        const desiredY = PLAYFIELD_TOP + 34 + (index % 4) * 92;
+        const minY = PLAYFIELD_TOP + image.displayHeight / 2 + 30;
+        const maxY = PLAY_BOTTOM - image.displayHeight / 2 - 30;
+        image.y = Phaser.Math.Clamp(desiredY, minY, maxY);
+        this.obstacles.push({
+          image,
+          passed: false,
+          hitScale: name.startsWith("txt") ? 0.32 : 0.58,
+        });
       });
     }
 
     jump() {
       this.velocity = -300;
-      this.playSound('jump');
+      this.playSound("jump");
     }
 
     update(_time, delta) {
-      if (this.mode !== 'playing' || this.pausedByVisibility) return;
+      if (this.mode !== "playing" || this.pausedByVisibility) return;
       const dt = Math.min(delta, 40) / 1000;
       this.velocity += 720 * dt;
       this.playerY += this.velocity * dt;
       this.player.y = this.playerY;
-      this.player.angle = Phaser.Math.Clamp(this.velocity * .035, -18, 30);
+      this.player.angle = Phaser.Math.Clamp(this.velocity * 0.035, -18, 30);
       const speed = 132 * dt;
       this.obstacles.forEach((item) => {
         item.image.x -= speed;
-        if (!item.passed && item.image.x + item.image.displayWidth / 2 < PLAYER_X - 4) {
+        if (
+          !item.passed &&
+          item.image.x + item.image.displayWidth / 2 < PLAYER_X - 4
+        ) {
           item.passed = true;
           this.score += 1;
         }
         if (this.fairHit(item)) this.endGame(false);
       });
-      if (this.playerY < PLAY_TOP + 22 || this.playerY > PLAY_BOTTOM - 30) this.endGame(false);
+      if (this.playerY < PLAYFIELD_TOP + 22 || this.playerY > PLAY_BOTTOM - 30)
+        this.endGame(false);
       if (this.score === this.obstacles.length) this.endGame(true);
     }
 
@@ -168,62 +263,107 @@
       const h = item.image.displayHeight * item.hitScale;
       return Phaser.Geom.Intersects.CircleToRectangle(
         p,
-        new Phaser.Geom.Rectangle(item.image.x - w / 2, item.image.y - h / 2, w, h)
+        new Phaser.Geom.Rectangle(
+          item.image.x - w / 2,
+          item.image.y - h / 2,
+          w,
+          h,
+        ),
       );
     }
 
     endGame(won) {
-      if (this.mode !== 'playing') return;
-      this.mode = won ? 'win' : 'fail';
+      if (this.mode !== "playing") return;
+      this.mode = won ? "win" : "fail";
       this.stopLoop();
       if (won) {
-        this.playSound('win');
-        this.playSound('applause', .18);
+        this.playSound("win");
+        this.playSound("applause", 0.18);
         this.showWin();
       } else {
-        this.playSound('crash');
-        this.playSound('fail');
+        this.playSound("crash");
+        this.playSound("fail");
         this.showFail();
       }
     }
 
     showFail() {
       this.clearStage();
-      this.addFull('bg');
-      ['fail-bubble', 'fail-bac1', 'fail-bac2', 'fail-bac3', 'fail-bac4', 'fail-bac5',
-        'fail-sad', 'fail-hl'].forEach((key, index) => {
+      this.addFull("bg");
+      [
+        "fail-bubble",
+        "fail-bac1",
+        "fail-bac2",
+        "fail-bac3",
+        "fail-bac4",
+        "fail-bac5",
+        "fail-sad",
+        "fail-hl",
+      ].forEach((key, index) => {
         const layer = this.addFull(key, index + 1);
         layer.setY(layer.y + (index % 2 ? 8 : -8));
-        this.tweens.add({ targets: layer, y: H / 2, duration: 500, delay: index * 55, ease: 'Back.out' });
+        this.tweens.add({
+          targets: layer,
+          y: H / 2,
+          duration: 500,
+          delay: index * 55,
+          ease: "Back.out",
+        });
       });
-      [['fail-cta', 180, 503], ['fail-replay', 180, 558]].forEach(([key, x, y], index) => {
+      [
+        ["fail-cta", 180, 503],
+        ["fail-replay", 180, 558],
+      ].forEach(([key, x, y], index) => {
         const layer = this.addHalf(key, x, y, 10 + index);
         layer.setY(y + 24).setAlpha(1);
-        this.tweens.add({ targets: layer, y, duration: 500, delay: 420 + index * 90, ease: 'Back.out' });
+        this.tweens.add({
+          targets: layer,
+          y,
+          duration: 500,
+          delay: 420 + index * 90,
+          ease: "Back.out",
+        });
       });
     }
 
     showWin() {
       this.clearStage();
-      this.addFull('bg');
-      ['win-bubble', 'win-konfetti', 'win-happy', 'win-hl'].forEach((key, index) => {
-        const layer = this.addFull(key, index + 1);
-        layer.setY(layer.y + 18);
-        this.tweens.add({ targets: layer, y: H / 2, duration: 650, delay: index * 80, ease: 'Back.out' });
-      });
-      const cta = this.addHalf('win-cta', 180, 584, 10);
+      this.addFull("bg");
+      ["win-bubble", "win-konfetti", "win-happy", "win-hl"].forEach(
+        (key, index) => {
+          const layer = this.addFull(key, index + 1);
+          layer.setY(layer.y + 18);
+          this.tweens.add({
+            targets: layer,
+            y: H / 2,
+            duration: 650,
+            delay: index * 80,
+            ease: "Back.out",
+          });
+        },
+      );
+      const cta = this.addHalf("win-cta", 180, 584, 10);
       cta.setY(608).setAlpha(1);
-      this.tweens.add({ targets: cta, y: 584, duration: 650, delay: 360, ease: 'Back.out' });
+      this.tweens.add({
+        targets: cta,
+        y: 584,
+        duration: 650,
+        delay: 360,
+        ease: "Back.out",
+      });
     }
 
     clickout() {
-      window.open('https://example.com', '_blank', 'noopener');
+      window.open("https://example.com", "_blank", "noopener");
     }
 
     playSound(key, volume) {
       if (!this.soundOn) return;
-      if (key === 'jump') return;
-      const sound = key === 'loop' ? this.audio.loop : this.sound.add(key, { volume: volume ?? .65 });
+      if (key === "jump") return;
+      const sound =
+        key === "loop"
+          ? this.audio.loop
+          : this.sound.add(key, { volume: volume ?? 0.65 });
       sound.play();
     }
 
@@ -253,12 +393,14 @@
 
   new Phaser.Game({
     type: Phaser.AUTO,
-    parent: 'game',
+    parent: "game",
     width: W,
     height: H,
-    backgroundColor: '#091d4c',
+    backgroundColor: "#091d4c",
     render: { antialias: true, roundPixels: false },
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-    scene: GutRun
+    scene: GutRun,
   });
+  // DEBUG:
+  window.game = game;
 })();
