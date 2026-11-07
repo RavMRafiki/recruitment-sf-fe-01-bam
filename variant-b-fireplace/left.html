@@ -1,19 +1,42 @@
 <!doctype html>
 <html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fireplace left</title>
-  <link rel="stylesheet" href="fireplace.css">
-</head>
-<body>
-  <main class="ad left" style="--width:320px;--height:975px" aria-label="Werbung">
-    <div class="layer background"></div>
-    <img class="layer overlay logo" src="assets/left/logo.png" alt="">
-    <img class="layer overlay content" src="assets/left/hl.png" alt="Beruhigt effektiv bei trockenem Reizhusten.">
-    <img class="layer overlay content box" src="assets/box.png" alt="">
-    <img class="layer cta" src="assets/cta.png" alt="Jetzt entdecken">
-  </main>
-  <script src="fireplace.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fireplace left</title>
+    <link rel="stylesheet" href="fireplace.css" />
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute">
+      <filter id="cut-black-png" color-interpolation-filters="sRGB">
+        <feColorMatrix
+          type="matrix"
+          values="
+      1 0 0 0 0
+      0 1 0 0 0
+      0 0 1 0 0
+      1 1 1 0 0"
+        />
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="255" intercept="0" />
+        </feComponentTransfer>
+      </filter>
+    </svg>
+    <main
+      class="ad left"
+      style="--width: 320px; --height: 975px"
+      aria-label="Werbung"
+    >
+      <div class="layer background"></div>
+      <img class="layer overlay logo" src="assets/left/logo.png" alt="" />
+      <img class="layer overlay content box" src="assets/box.png" alt="" />
+      <img
+        class="layer overlay content"
+        src="assets/left/hl.png"
+        alt="Beruhigt effektiv bei trockenem Reizhusten."
+      />
+      <img class="layer cta" src="assets/cta.png" alt="Jetzt entdecken" />
+    </main>
+    <script src="fireplace.js"></script>
+  </body>
 </html>
