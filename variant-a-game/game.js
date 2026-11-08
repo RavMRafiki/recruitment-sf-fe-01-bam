@@ -1,4 +1,5 @@
-/* global Phaser */
+import Phaser from "phaser";
+
 (() => {
   "use strict";
 
@@ -68,17 +69,17 @@
     }
 
     preload() {
-      this.load.image("bg", `${ASSET}bg.jpg`);
-      this.load.image("border", `${ASSET}border.png`);
-      this.load.image("logo", `${ASSET}logo.png`);
-      this.load.image("gesture", `${ASSET}gesture.png`);
-      this.load.image("gameplay", `${ASSET}01_game/gameplay.png`);
-      this.load.image("texture", `${ASSET}01_game/bg_texture.png`);
-      this.load.image("player", `${ASSET}01_game/player.png`);
-      this.load.image("tut", `${ASSET}01_game/tut.png`);
+      this.load.image("bg", `${ASSET}bg.webp`);
+      this.load.image("border", `${ASSET}border.webp`);
+      this.load.image("logo", `${ASSET}logo.webp`);
+      this.load.image("gesture", `${ASSET}gesture.webp`);
+      this.load.image("gameplay", `${ASSET}01_game/gameplay.webp`);
+      this.load.image("texture", `${ASSET}01_game/bg_texture.webp`);
+      this.load.image("player", `${ASSET}01_game/player.webp`);
+      this.load.image("tut", `${ASSET}01_game/tut.webp`);
       obstacleNames.forEach((name) => {
         const folder = name.startsWith("bac") ? "01_game" : "01_game";
-        this.load.image(name, `${ASSET}${folder}/${name}.png`);
+        this.load.image(name, `${ASSET}${folder}/${name}.webp`);
       });
       [
         "fail-bubble",
@@ -101,7 +102,7 @@
           key.split("-").length > 2
             ? [key.split("-")[0], key.substring(key.indexOf("-") + 1)]
             : [key.split("-")[0], key.substring(key.indexOf("-") + 1)];
-        this.load.image(key, `${ASSET}02_endcard/${card}/${file}.png`);
+        this.load.image(key, `${ASSET}02_endcard/${card}/${file}.webp`);
       });
       this.load.audio(
         "loop",
