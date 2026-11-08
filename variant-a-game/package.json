@@ -1,0 +1,19 @@
+{
+  "name": "variant-a-game",
+  "version": "1.0.0",
+  "description": "Gut Run Phaser game",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "dependencies": {
+    "phaser": "^3.80.1"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}
