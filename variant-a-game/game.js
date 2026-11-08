@@ -141,7 +141,14 @@
         event.stopPropagation();
         this.soundOn = !this.soundOn;
         this.sound.mute = !this.soundOn;
-        event.currentTarget.textContent = this.soundOn ? "🔊" : "🔇";
+        const icon = event.currentTarget.querySelector("img");
+        icon.src = `assets/icons/${
+          this.soundOn ? "volume-high" : "volume-xmark"
+        }.svg`;
+        event.currentTarget.setAttribute(
+          "aria-label",
+          this.soundOn ? "Ton ausschalten" : "Ton einschalten",
+        );
         event.currentTarget.classList.toggle("is-muted", !this.soundOn);
       });
       this.showStart();
