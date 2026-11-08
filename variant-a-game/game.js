@@ -8,6 +8,7 @@
   const PLAYFIELD_TOP = 220;
   const PLAY_BOTTOM = 600;
   const PLAYER_X = 82;
+  const START_JUMP_INTERVAL = 800;
   const ASSET = "assets/";
   const obstacleNames = [
     "bac1",
@@ -241,7 +242,8 @@
       this.tweens.add({
         targets: gesture,
         scale: 0.54,
-        duration: 700,
+        duration: START_JUMP_INTERVAL / 2,
+        delay: START_JUMP_INTERVAL / 2,
         yoyo: true,
         repeat: -1,
         ease: "Sine.inOut",
@@ -405,7 +407,7 @@
       this.startJumpTimer -= delta;
       if (this.startJumpTimer <= 0) {
         this.startPlayerVelocity = -300;
-        this.startJumpTimer = 800;
+        this.startJumpTimer = START_JUMP_INTERVAL;
       }
       this.startPlayerVelocity += 720 * dt;
       this.startPlayerY += this.startPlayerVelocity * dt;
@@ -415,7 +417,7 @@
       } else if (this.startPlayerY > 470) {
         this.startPlayerY = 470;
         this.startPlayerVelocity = -300;
-        this.startJumpTimer = 800;
+        this.startJumpTimer = START_JUMP_INTERVAL;
       }
       this.startPlayer.y = this.startPlayerY;
       this.startPlayer.angle = Phaser.Math.Clamp(
