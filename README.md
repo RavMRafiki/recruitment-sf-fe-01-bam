@@ -46,11 +46,11 @@ The two servers must use different ports if you want to view both variants at th
 - Both variants use the supplied raster artwork directly; there is no runtime asset pipeline beyond Vite’s static copying.
 - The fireplace preview uses fixed 320 × 975 and 1032 × 250 panels, so the local preview is a layout proof rather than a fully responsive publisher mock.
 - Fireplace clicks currently fall back to `https://example.com/` unless a `clickTag` query parameter or `window.clickTag` is provided.
-- When allow-popups is not added to iframe containing the game the opening will fallback to opening the `clickTag` link in the current window. (This happens when using Safari on IPhone)
+- When `allow-popups` is not added to the iframe containing the game, opening a new tab falls back to opening the `clickTag` link in the current window. (This happens when using Safari on iPhone.)
 - Audio is implemented in the game and depends on browser user-gesture/autoplay rules; the mute control is available after loading.
 - Collision shapes in the game are hand-authored approximations and do not always match the exact visible size of each obstacle.
 - The fireplace preview's debug overlay for checking the design layout was not tested across different screen sizes and works fully only in a full-screen view.
-- The game was only tested on one Android phone using Chrome and one iPhone using Safari.
+- The game was tested only on one Android phone using Chrome and one iPhone using Safari.
 
 ## AI note
 
