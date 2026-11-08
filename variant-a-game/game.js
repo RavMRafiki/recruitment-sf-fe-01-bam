@@ -317,6 +317,8 @@
       this.player.y = this.playerY;
       this.player.angle = Phaser.Math.Clamp(this.velocity * 0.035, -18, 30);
       const speed = 132 * dt;
+      const backgroundSpeed = 0.5 * speed;
+      this.gut.x -= backgroundSpeed;
       this.obstacles.forEach((item) => {
         item.image.x -= speed;
         if (
