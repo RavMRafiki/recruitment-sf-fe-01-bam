@@ -10,6 +10,7 @@ import Phaser from "phaser";
   const PLAY_BOTTOM = 600;
   const PLAYER_X = 82;
   const START_JUMP_INTERVAL = 800;
+  const RENDER_RESOLUTION = Math.min(window.devicePixelRatio || 1, 2);
   const ASSET = "assets/";
   const obstacleNames = [
     "bac1",
@@ -690,7 +691,20 @@ import Phaser from "phaser";
     }
 
     clickout() {
-      window.open("https://example.com", "_blank", "noopener");
+      const clickTag =
+        new URLSearchParams(window.location.search).get("clickTag") ||
+        window.clickTag ||
+        "https://example.com/";
+      try {
+        const popup = window.open(clickTag, "_blank");
+        if (popup) {
+          popup.opener = null;
+        } else {
+          window.location.assign(clickTag);
+        }
+      } catch {
+        window.location.assign(clickTag);
+      }
     }
 
     playSound(key, volume) {
@@ -735,6 +749,7 @@ import Phaser from "phaser";
     width: W,
     height: H,
     backgroundColor: "#091d4c",
+    resolution: RENDER_RESOLUTION,
     render: { antialias: true, roundPixels: false },
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     scene: GutRun,
