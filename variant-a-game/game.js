@@ -57,7 +57,9 @@
       this.obstacles = [];
       this.audio = {};
       this.soundOn = true;
-      this.pausedByVisibility = false;
+      this.pausedByEnvironment = false;
+      this.windowFocused = true;
+      this.mouseInsideGame = true;
       this.debugMode = new URLSearchParams(window.location.search).has("debug");
     }
 
@@ -113,11 +115,27 @@
     create() {
       this.input.addPointer(1);
       this.input.on("pointerdown", this.handleTap, this);
-      document.addEventListener(
-        "visibilitychange",
-        () => this.handleVisibility(),
-        { passive: true },
-      );
+      this.windowFocused = document.hasFocus();
+      document.addEventListener("visibilitychange", () => {
+        this.updateEnvironmentPause();
+      });
+      window.addEventListener("blur", () => {
+        this.windowFocused = false;
+        this.updateEnvironmentPause();
+      });
+      window.addEventListener("focus", () => {
+        this.windowFocused = true;
+        this.updateEnvironmentPause();
+      });
+      const gameElement = document.getElementById("game");
+      gameElement.addEventListener("mouseenter", () => {
+        this.mouseInsideGame = true;
+        this.updateEnvironmentPause();
+      });
+      gameElement.addEventListener("mouseleave", () => {
+        this.mouseInsideGame = false;
+        this.updateEnvironmentPause();
+      });
       document.getElementById("mute").addEventListener("click", (event) => {
         event.stopPropagation();
         this.soundOn = !this.soundOn;
@@ -235,7 +253,7 @@
     }
 
     handleTap(pointer) {
-      if (this.pausedByVisibility || !pointer) return;
+      if (this.pausedByEnvironment || !pointer) return;
       if (this.mode === "start") {
         this.startGame();
       } else if (this.mode === "countdown" || this.mode === "playing") {
@@ -325,7 +343,7 @@
       }
       if (
         (this.mode !== "countdown" && this.mode !== "playing") ||
-        this.pausedByVisibility
+        this.pausedByEnvironment
       )
         return;
       const dt = Math.min(delta, 40) / 1000;
@@ -386,7 +404,7 @@
     }
 
     updateStartPreview(delta) {
-      if (this.pausedByVisibility || !this.startPlayer) return;
+      if (this.pausedByEnvironment || !this.startPlayer) return;
       const dt = Math.min(delta, 40) / 1000;
       this.startJumpTimer -= delta;
       if (this.startJumpTimer <= 0) {
@@ -609,10 +627,11 @@
       if (this.audio.loop) this.audio.loop.stop();
     }
 
-    handleVisibility() {
-      const hidden = document.hidden;
-      this.pausedByVisibility = hidden;
-      if (hidden) {
+    updateEnvironmentPause() {
+      const shouldPause =
+        document.hidden || !this.windowFocused || !this.mouseInsideGame;
+      this.pausedByEnvironment = shouldPause;
+      if (shouldPause) {
         this.scene.pause();
         this.sound.pauseAll();
       } else {
