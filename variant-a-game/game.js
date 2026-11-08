@@ -151,7 +151,15 @@
         .rectangle(W / 2, 0, W, PLAY_TOP, 0xffffff)
         .setOrigin(0.5, 0)
         .setDepth(1);
-      this.addFull("logo", 2);
+      const logo = this.addFull("logo", 2);
+      logo.setY(-8).setAlpha(0);
+      this.tweens.add({
+        targets: logo,
+        y: H / 2,
+        alpha: 1,
+        duration: 520,
+        ease: "Back.out",
+      });
       this.add
         .rectangle(W / 2, 58, W, 1, 0x091d4c)
         .setOrigin(0.5, 0)
@@ -163,20 +171,59 @@
         .setDepth(0);
       this.addFull("texture", 1);
       this.addFull("border", 4);
-      this.addFull("tut", 5);
-      this.add.image(76, 280, "player").setScale(0.5).setDepth(6);
+      const headline = this.addFull("tut", 5);
+      headline.setY(H / 2 + 12).setAlpha(0);
+      this.tweens.add({
+        targets: headline,
+        y: H / 2,
+        alpha: 1,
+        duration: 560,
+        delay: 140,
+        ease: "Back.out",
+      });
+      const introPlayer = this.add
+        .image(76, 280, "player")
+        .setScale(0.5)
+        .setDepth(6);
+      this.startPlayer = introPlayer;
+      this.startPlayerY = 280;
+      this.startPlayerVelocity = 0;
+      this.startJumpTimer = 300;
+      introPlayer.setScale(0.4);
+      this.tweens.add({
+        targets: introPlayer,
+        scale: 0.5,
+        duration: 480,
+        delay: 240,
+        ease: "Back.out",
+      });
       [
         ["bac6", 109, 348],
         ["bac2", 289, 367],
         ["txt1", 108, 418],
         ["txt2", 321, 448],
       ].forEach(([key, x, y]) => {
-        this.add.image(x, y, key).setScale(0.5).setDepth(6);
+        const enemy = this.add.image(x, y, key).setScale(0.4).setDepth(6);
+        this.tweens.add({
+          targets: enemy,
+          scale: 0.5,
+          duration: 420,
+          delay: 260 + x,
+          ease: "Back.out",
+        });
       });
       const gesture = this.add
         .image(190, 500, "gesture")
         .setScale(0.5)
         .setDepth(6);
+      gesture.setY(512);
+      this.tweens.add({
+        targets: gesture,
+        y: 500,
+        duration: 500,
+        delay: 520,
+        ease: "Back.out",
+      });
       this.tweens.add({
         targets: gesture,
         scale: 0.54,
@@ -259,6 +306,10 @@
     }
 
     update(_time, delta) {
+      if (this.mode === "start") {
+        this.updateStartPreview(delta);
+        return;
+      }
       if (this.mode !== "playing" || this.pausedByVisibility) return;
       const dt = Math.min(delta, 40) / 1000;
       this.velocity += 720 * dt;
@@ -281,6 +332,32 @@
       if (this.playerY < PLAYFIELD_TOP + 22 || this.playerY > PLAY_BOTTOM - 30)
         this.endGame(false);
       if (this.score === this.obstacles.length) this.endGame(true);
+    }
+
+    updateStartPreview(delta) {
+      if (this.pausedByVisibility || !this.startPlayer) return;
+      const dt = Math.min(delta, 40) / 1000;
+      this.startJumpTimer -= delta;
+      if (this.startJumpTimer <= 0) {
+        this.startPlayerVelocity = -300;
+        this.startJumpTimer = 800;
+      }
+      this.startPlayerVelocity += 720 * dt;
+      this.startPlayerY += this.startPlayerVelocity * dt;
+      if (this.startPlayerY < 250) {
+        this.startPlayerY = 250;
+        this.startPlayerVelocity = 0;
+      } else if (this.startPlayerY > 470) {
+        this.startPlayerY = 470;
+        this.startPlayerVelocity = -300;
+        this.startJumpTimer = 800;
+      }
+      this.startPlayer.y = this.startPlayerY;
+      this.startPlayer.angle = Phaser.Math.Clamp(
+        this.startPlayerVelocity * 0.035,
+        -18,
+        30,
+      );
     }
 
     fairHit(item) {
