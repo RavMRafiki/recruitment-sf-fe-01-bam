@@ -149,7 +149,7 @@ body {
   transition: scale 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
   animation:
     cta-in 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) 4.1s both,
-    cta-pulse 4s ease-in-out 6s 6;
+    cta-pulse 10s ease-in-out 6s infinite;
 }
 
 .ad.is-started:hover .cta {
@@ -227,7 +227,10 @@ body {
     transform: scale(1);
   }
   18% {
-    transform: scale(1.025);
+    transform: scale(1.05);
+  }
+  67% {
+    transform: scale(1.085);
   }
   100% {
     transform: scale(1);
