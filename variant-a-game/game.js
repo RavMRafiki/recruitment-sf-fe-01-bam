@@ -524,6 +524,15 @@
     showFail() {
       this.clearStage();
       this.addFull("bg");
+      const logo = this.addFull("logo", 2);
+      logo.setY(-8).setAlpha(0);
+      this.tweens.add({
+        targets: logo,
+        y: H / 2,
+        alpha: 1,
+        duration: 520,
+        ease: "Back.out",
+      });
       [
         "fail-bubble",
         "fail-bac1",
@@ -543,6 +552,18 @@
           delay: index * 55,
           ease: "Back.out",
         });
+        if (key.startsWith("fail-bac")) {
+          this.tweens.add({
+            targets: layer,
+            scaleX: layer.scaleX * 1.04,
+            scaleY: layer.scaleY * 1.04,
+            duration: 200,
+            delay: 1000 + index * 55,
+            yoyo: true,
+            repeat: 5,
+            ease: "Sine.inOut",
+          });
+        }
       });
       [
         ["fail-cta", 180, 503],
