@@ -61,6 +61,9 @@
       this.pausedByEnvironment = false;
       this.windowFocused = true;
       this.mouseInsideGame = true;
+      this.reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
       this.debugMode = new URLSearchParams(window.location.search).has("debug");
     }
 
@@ -169,6 +172,20 @@
         .setDepth(depth);
     }
 
+    addTween(config) {
+      if (this.reducedMotion) {
+        this.tweens.add({
+          ...config,
+          delay: 0,
+          duration: 0,
+          repeat: 0,
+          yoyo: false,
+        });
+        return;
+      }
+      this.tweens.add(config);
+    }
+
     showStart() {
       this.clearStage();
       this.mode = "start";
@@ -179,7 +196,7 @@
         .setDepth(1);
       const logo = this.addFull("logo", 2);
       logo.setY(-8).setAlpha(0);
-      this.tweens.add({
+      this.addTween({
         targets: logo,
         y: H / 2,
         alpha: 1,
@@ -195,7 +212,7 @@
       this.addFull("border", 4);
       const headline = this.addFull("tut", 5);
       headline.setY(H / 2 + 12).setAlpha(0);
-      this.tweens.add({
+      this.addTween({
         targets: headline,
         y: H / 2,
         alpha: 1,
@@ -212,7 +229,7 @@
       this.startPlayerVelocity = 0;
       this.startJumpTimer = 300;
       introPlayer.setScale(0.4);
-      this.tweens.add({
+      this.addTween({
         targets: introPlayer,
         scale: 0.5,
         duration: 480,
@@ -226,7 +243,7 @@
         ["txt2", 321, 448],
       ].forEach(([key, x, y]) => {
         const enemy = this.add.image(x, y, key).setScale(0.4).setDepth(6);
-        this.tweens.add({
+        this.addTween({
           targets: enemy,
           scale: 0.5,
           duration: 420,
@@ -239,14 +256,14 @@
         .setScale(0.5)
         .setDepth(6);
       gesture.setY(512);
-      this.tweens.add({
+      this.addTween({
         targets: gesture,
         y: 500,
         duration: 500,
         delay: 520,
         ease: "Back.out",
       });
-      this.tweens.add({
+      this.addTween({
         targets: gesture,
         scale: 0.54,
         duration: START_JUMP_INTERVAL / 2,
@@ -366,7 +383,7 @@
       const currentSpeed = 132 + Math.min(this.gameplayElapsed * 8, 108);
       const speed = currentSpeed * dt;
       const backgroundSpeed = 0.5 * speed;
-      this.gut.x -= backgroundSpeed;
+      if (!this.reducedMotion) this.gut.x -= backgroundSpeed;
       this.obstacles.forEach((item) => {
         item.image.x -= speed;
         if (
@@ -394,7 +411,7 @@
               : "START";
       if (step !== this.countdownLabel.text) {
         this.countdownLabel.setText(step).setScale(0.7).setAlpha(1);
-        this.tweens.add({
+        this.addTween({
           targets: this.countdownLabel,
           scale: 1,
           duration: 220,
@@ -409,7 +426,12 @@
     }
 
     updateStartPreview(delta) {
-      if (this.pausedByEnvironment || !this.startPlayer) return;
+      if (
+        this.reducedMotion ||
+        this.pausedByEnvironment ||
+        !this.startPlayer
+      )
+        return;
       const dt = Math.min(delta, 40) / 1000;
       this.startJumpTimer -= delta;
       if (this.startJumpTimer <= 0) {
@@ -533,7 +555,7 @@
       this.addFull("bg");
       const logo = this.addFull("logo", 2);
       logo.setY(-8).setAlpha(0);
-      this.tweens.add({
+      this.addTween({
         targets: logo,
         y: H / 2,
         alpha: 1,
@@ -552,7 +574,7 @@
       ].forEach((key, index) => {
         const layer = this.addFull(key, index + 1);
         layer.setY(layer.y + (index % 2 ? 8 : -8));
-        this.tweens.add({
+        this.addTween({
           targets: layer,
           y: H / 2,
           duration: 500,
@@ -560,7 +582,7 @@
           ease: "Back.out",
         });
         if (key.startsWith("fail-bac")) {
-          this.tweens.add({
+          this.addTween({
             targets: layer,
             scaleX: layer.scaleX * 1.04,
             scaleY: layer.scaleY * 1.04,
@@ -578,14 +600,14 @@
       ].forEach(([key, x, y], index) => {
         const layer = this.addHalf(key, x, y, 10 + index);
         layer.setY(y + 24).setAlpha(1);
-        this.tweens.add({
+        this.addTween({
           targets: layer,
           y,
           duration: 500,
           delay: 420 + index * 90,
           ease: "Back.out",
         });
-        this.tweens.add({
+        this.addTween({
           targets: layer,
           scaleX: layer.scaleX * 1.03,
           scaleY: layer.scaleY * 1.03,
@@ -603,7 +625,7 @@
       this.addFull("bg");
       const logo = this.addFull("logo", 2);
       logo.setY(-8).setAlpha(0);
-      this.tweens.add({
+      this.addTween({
         targets: logo,
         y: H / 2,
         alpha: 1,
@@ -614,7 +636,7 @@
         (key, index) => {
           const layer = this.addFull(key, index + 1);
           layer.setY(layer.y + 18);
-          this.tweens.add({
+          this.addTween({
             targets: layer,
             y: H / 2,
             duration: 650,
@@ -622,7 +644,7 @@
             ease: "Back.out",
           });
           if (key === "win-happy") {
-            this.tweens.add({
+            this.addTween({
               targets: layer,
               y: H / 2 - 50,
               duration: 400,
@@ -633,7 +655,7 @@
             });
           }
           if (key === "win-konfetti") {
-            this.tweens.add({
+            this.addTween({
               targets: layer,
               scaleX: layer.scaleX * 1.1,
               scaleY: layer.scaleY * 1.1,
@@ -647,14 +669,14 @@
       );
       const cta = this.addHalf("win-cta", 180, 584, 10);
       cta.setY(608).setAlpha(1);
-      this.tweens.add({
+      this.addTween({
         targets: cta,
         y: 584,
         duration: 650,
         delay: 360,
         ease: "Back.out",
       });
-      this.tweens.add({
+      this.addTween({
         targets: cta,
         scaleX: cta.scaleX * 1.03,
         scaleY: cta.scaleY * 1.03,
