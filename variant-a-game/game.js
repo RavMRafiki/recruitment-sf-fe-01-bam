@@ -627,7 +627,7 @@
 
     updateEnvironmentPause() {
       const shouldPause =
-        this.mode !== "start" &&
+        (this.mode === "countdown" || this.mode === "playing") &&
         (document.hidden || !this.windowFocused || !this.mouseInsideGame);
       this.pausedByEnvironment = shouldPause;
       if (shouldPause) {
