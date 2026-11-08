@@ -254,6 +254,7 @@
       this.playerY = 350;
       this.velocity = 0;
       this.countdownElapsed = 0;
+      this.gameplayElapsed = 0;
       this.obstacles = [];
       this.addFull("bg");
       this.gut = this.add
@@ -338,7 +339,9 @@
         this.updateCountdown(delta);
         return;
       }
-      const speed = 132 * dt;
+      this.gameplayElapsed += dt;
+      const currentSpeed = 132 + Math.min(this.gameplayElapsed * 8, 108);
+      const speed = currentSpeed * dt;
       const backgroundSpeed = 0.5 * speed;
       this.gut.x -= backgroundSpeed;
       this.obstacles.forEach((item) => {
