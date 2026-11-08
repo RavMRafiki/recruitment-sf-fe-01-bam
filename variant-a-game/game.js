@@ -213,9 +213,9 @@
         ease: "Back.out",
       });
       [
-        ["bac6", 109, 348],
+        ["bac6", 109, 375],
         ["bac2", 289, 367],
-        ["txt1", 108, 418],
+        ["txt1", 108, 450],
         ["txt2", 321, 448],
       ].forEach(([key, x, y]) => {
         const enemy = this.add.image(x, y, key).setScale(0.4).setDepth(6);
