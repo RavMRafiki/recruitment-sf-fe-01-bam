@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fireplace preview</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #242424;
+        color: #ddd;
+        font:
+          14px Arial,
+          sans-serif;
+      }
+      body {
+        position: relative;
+        padding-top: 27px;
+      }
+      .preview {
+        width: 1672px;
+        margin: 0 auto;
+      }
+      .labels {
+        display: grid;
+        grid-template-columns: 320px 1032px 320px;
+        gap: 0;
+        margin-bottom: 5px;
+      }
+      .labels div {
+        padding-left: 4px;
+        font-size: 16px;
+      }
+      .frame {
+        display: grid;
+        grid-template-columns: 320px 1032px 320px;
+        grid-template-rows: 250px 725px;
+      }
+      iframe {
+        display: block;
+        border: 0;
+      }
+      .top {
+        grid-column: 2;
+        grid-row: 1;
+        width: 1032px;
+        height: 250px;
+      }
+      .left {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        width: 320px;
+        height: 975px;
+      }
+      .right {
+        grid-column: 3;
+        grid-row: 1 / span 2;
+        width: 320px;
+        height: 975px;
+      }
+      .website {
+        grid-column: 2;
+        grid-row: 2;
+        background: #282828;
+        border-top: 3px solid #555;
+      }
+      .tools {
+        margin: 14px 0 0;
+        color: #aaa;
+        position: relative;
+        z-index: 2;
+      }
+      .layout-overlay {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        left: 50%;
+        width: 1723px;
+        height: auto;
+        max-width: none;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateX(calc(-50% - 3px));
+      }
+      .opacity-control {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 12px;
+      }
+      .opacity-control input {
+        width: 120px;
+        accent-color: #aaa;
+        vertical-align: middle;
+      }
+      button {
+        padding: 7px 12px;
+        color: #fff;
+        background: #444;
+        border: 1px solid #777;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="preview" aria-label="Fireplace ad preview">
+      <div class="labels">
+        <div>Fireplace_left</div>
+        <div>Fireplace_top</div>
+        <div>Fireplace_right</div>
+      </div>
+      <div class="frame">
+        <iframe class="left" title="Fireplace left" src="left.html"></iframe>
+        <iframe class="top" title="Fireplace top" src="top.html"></iframe>
+        <div class="website" aria-label="Publisher website">
+          <p class="tools">
+            <button id="replay" type="button">Replay intro</button>
+            <label class="opacity-control" for="layout-opacity">
+              Layout opacity
+              <input
+                id="layout-opacity"
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value="0.0"
+              />
+              <output id="layout-opacity-value">0%</output>
+            </label>
+          </p>
+        </div>
+        <iframe class="right" title="Fireplace right" src="right.html"></iframe>
+      </div>
+    </section>
+    <img
+      class="layout-overlay"
+      id="layout-overlay"
+      src="./assets/layout-BkwOgU0r.webp"
+      alt=""
+      aria-hidden="true"
+    />
+    <script>
+      (function () {
+        var frames = Array.from(document.querySelectorAll("iframe"));
+        var ready = new Set();
+        var layoutOverlay = document.getElementById("layout-overlay");
+        var opacitySlider = document.getElementById("layout-opacity");
+        var opacityValue = document.getElementById("layout-opacity-value");
+        function updateOverlayOpacity() {
+          var opacity = Number(opacitySlider.value);
+          layoutOverlay.style.opacity = opacity;
+          opacityValue.textContent = Math.round(opacity * 100) + "%";
+        }
+        function start(frame) {
+          frame.contentWindow.postMessage({ type: "fireplace:start" }, "*");
+        }
+        window.addEventListener("message", function (event) {
+          if (event.data && event.data.type === "fireplace:ready") {
+            ready.add(event.source);
+            if (ready.size === frames.length) frames.forEach(start);
+          }
+        });
+        document
+          .getElementById("replay")
+          .addEventListener("click", function () {
+            var replay = document.getElementById("replay");
+            replay.disabled = true;
+            ready.clear();
+            frames.forEach(function (frame) {
+              frame.src = frame.src;
+            });
+            setTimeout(function () {
+              replay.disabled = false;
+            }, 200);
+          });
+        opacitySlider.addEventListener("input", updateOverlayOpacity);
+      })();
+    </script>
+  </body>
+</html>
