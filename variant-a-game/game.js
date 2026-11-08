@@ -254,7 +254,7 @@
       if (this.pausedByEnvironment || !pointer) return;
       if (this.mode === "start") {
         this.startGame();
-      } else if (this.mode === "countdown" || this.mode === "playing") {
+      } else if (this.mode === "playing") {
         this.jump();
       } else if (this.mode === "fail" && pointer.y > 530) {
         this.startGame();
@@ -344,6 +344,10 @@
         this.pausedByEnvironment
       )
         return;
+      if (this.mode === "countdown") {
+        this.updateCountdown(delta);
+        return;
+      }
       const dt = Math.min(delta, 40) / 1000;
       this.velocity += 720 * dt;
       this.playerY += this.velocity * dt;
@@ -351,10 +355,6 @@
       this.player.angle = Phaser.Math.Clamp(this.velocity * 0.035, -18, 30);
       if (this.playerY < PLAYFIELD_TOP + 22 || this.playerY > PLAY_BOTTOM - 30)
         this.endGame(false);
-      if (this.mode === "countdown") {
-        this.updateCountdown(delta);
-        return;
-      }
       this.gameplayElapsed += dt;
       const currentSpeed = 132 + Math.min(this.gameplayElapsed * 8, 108);
       const speed = currentSpeed * dt;
