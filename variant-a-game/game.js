@@ -284,7 +284,7 @@
     }
 
     fairHit(item) {
-      const p = new Phaser.Geom.Circle(this.player.x, this.player.y, 15);
+      const p = new Phaser.Geom.Circle(this.player.x, this.player.y, 17);
       return this.getEnemyHitboxes(item).some((hitbox) =>
         hitbox.type === "circle"
           ? Phaser.Geom.Intersects.CircleToCircle(p, hitbox.shape)
@@ -346,7 +346,7 @@
         PLAY_BOTTOM - PLAYFIELD_TOP,
       );
       this.debugGraphics.lineStyle(2, 0x00ff66, 1);
-      this.debugGraphics.strokeCircle(this.player.x, this.player.y, 15);
+      this.debugGraphics.strokeCircle(this.player.x, this.player.y, 17);
       this.obstacles.forEach((item) => {
         this.getEnemyHitboxes(item).forEach((hitbox) => {
           if (hitbox.type === "circle") {
