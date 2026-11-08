@@ -694,7 +694,16 @@ import Phaser from "phaser";
         new URLSearchParams(window.location.search).get("clickTag") ||
         window.clickTag ||
         "https://example.com/";
-      window.open(clickTag, "_blank", "noopener");
+      try {
+        const popup = window.open(clickTag, "_blank");
+        if (popup) {
+          popup.opener = null;
+        } else {
+          window.location.assign(clickTag);
+        }
+      } catch {
+        window.location.assign(clickTag);
+      }
     }
 
     playSound(key, volume) {
