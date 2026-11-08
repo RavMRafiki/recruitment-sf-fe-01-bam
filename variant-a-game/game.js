@@ -573,6 +573,15 @@
     showWin() {
       this.clearStage();
       this.addFull("bg");
+      const logo = this.addFull("logo", 2);
+      logo.setY(-8).setAlpha(0);
+      this.tweens.add({
+        targets: logo,
+        y: H / 2,
+        alpha: 1,
+        duration: 520,
+        ease: "Back.out",
+      });
       ["win-bubble", "win-konfetti", "win-happy", "win-hl"].forEach(
         (key, index) => {
           const layer = this.addFull(key, index + 1);
@@ -584,6 +593,28 @@
             delay: index * 80,
             ease: "Back.out",
           });
+          if (key === "win-happy") {
+            this.tweens.add({
+              targets: layer,
+              y: H / 2 - 50,
+              duration: 400,
+              delay: 900,
+              yoyo: true,
+              repeat: 2,
+              ease: "Sine.inOut",
+            });
+          }
+          if (key === "win-konfetti") {
+            this.tweens.add({
+              targets: layer,
+              scaleX: layer.scaleX * 1.1,
+              scaleY: layer.scaleY * 1.1,
+              duration: 250,
+              delay: 300,
+              yoyo: true,
+              ease: "Sine.inOut",
+            });
+          }
         },
       );
       const cta = this.addHalf("win-cta", 180, 584, 10);
