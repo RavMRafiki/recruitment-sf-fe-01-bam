@@ -26,6 +26,29 @@
     "txt8",
     "txt9",
   ];
+  const hitboxDefinitions = {
+    bac1: { type: "circle", radius: 0.45 },
+    bac2: { type: "rectangle", width: 0.58, height: 1 },
+    bac3: { type: "rectangle", width: 1, height: 0.8 },
+    bac4: {
+      type: "multiple",
+      shapes: [
+        { type: "rectangle", x: -0.32, y: -0.2, width: 0.4, height: 0.5 },
+        { type: "rectangle", x: 0.2, y: 0.2, width: 0.7, height: 0.5 },
+      ],
+    },
+    bac5: { type: "circle", radius: 0.55 },
+    bac6: { type: "circle", radius: 0.52 },
+    txt1: { type: "rectangle", width: 0.7, height: 1 },
+    txt2: { type: "rectangle", width: 0.8, height: 1 },
+    txt3: { type: "rectangle", width: 1, height: 1 },
+    txt4: { type: "rectangle", width: 0.8, height: 1 },
+    txt5: { type: "rectangle", width: 0.8, height: 1 },
+    txt6: { type: "rectangle", width: 0.8, height: 1 },
+    txt7: { type: "rectangle", width: 1, height: 1 },
+    txt8: { type: "rectangle", width: 0.8, height: 1 },
+    txt9: { type: "rectangle", width: 0.8, height: 1 },
+  };
 
   class GutRun extends Phaser.Scene {
     constructor() {
@@ -35,6 +58,7 @@
       this.audio = {};
       this.soundOn = true;
       this.pausedByVisibility = false;
+      this.debugMode = new URLSearchParams(window.location.search).has("debug");
     }
 
     preload() {
@@ -201,6 +225,7 @@
         .setDepth(4);
       this.addFull("border", 6);
       this.makeObstacles();
+      this.debugGraphics = this.add.graphics().setDepth(20);
       this.audio.loop = this.sound.add("loop", { loop: true, volume: 0.22 });
       this.playSound("loop");
       this.gameStart = this.time.now;
@@ -223,7 +248,7 @@
         this.obstacles.push({
           image,
           passed: false,
-          hitScale: name.startsWith("txt") ? 0.32 : 0.58,
+          hitbox: hitboxDefinitions[name],
         });
       });
     }
@@ -252,6 +277,7 @@
         }
         if (this.fairHit(item)) this.endGame(false);
       });
+      this.drawDebugHitboxes();
       if (this.playerY < PLAYFIELD_TOP + 22 || this.playerY > PLAY_BOTTOM - 30)
         this.endGame(false);
       if (this.score === this.obstacles.length) this.endGame(true);
@@ -259,17 +285,81 @@
 
     fairHit(item) {
       const p = new Phaser.Geom.Circle(this.player.x, this.player.y, 15);
-      const w = item.image.displayWidth * item.hitScale;
-      const h = item.image.displayHeight * item.hitScale;
-      return Phaser.Geom.Intersects.CircleToRectangle(
-        p,
-        new Phaser.Geom.Rectangle(
-          item.image.x - w / 2,
-          item.image.y - h / 2,
-          w,
-          h,
-        ),
+      return this.getEnemyHitboxes(item).some((hitbox) =>
+        hitbox.type === "circle"
+          ? Phaser.Geom.Intersects.CircleToCircle(p, hitbox.shape)
+          : Phaser.Geom.Intersects.CircleToRectangle(p, hitbox.shape),
       );
+    }
+
+    getEnemyHitboxes(item) {
+      const definition = item.hitbox;
+      const definitions =
+        definition.type === "multiple" ? definition.shapes : [definition];
+      return definitions.map((shape) => this.createEnemyHitbox(item, shape));
+    }
+
+    createEnemyHitbox(item, definition) {
+      const x =
+        item.image.x +
+        (definition.x ?? definition.offsetX ?? 0) * item.image.displayWidth;
+      const y =
+        item.image.y +
+        (definition.y ?? definition.offsetY ?? 0) * item.image.displayHeight;
+      if (definition.type === "circle") {
+        return {
+          type: definition.type,
+          shape: new Phaser.Geom.Circle(
+            x,
+            y,
+            Math.min(item.image.displayWidth, item.image.displayHeight) *
+              definition.radius,
+          ),
+        };
+      }
+      const size =
+        definition.type === "square"
+          ? Math.min(item.image.displayWidth, item.image.displayHeight) *
+            definition.size
+          : null;
+      const width = size ?? item.image.displayWidth * definition.width;
+      const height = size ?? item.image.displayHeight * definition.height;
+      return {
+        type: definition.type,
+        shape: new Phaser.Geom.Rectangle(
+          x - width / 2,
+          y - height / 2,
+          width,
+          height,
+        ),
+      };
+    }
+
+    drawDebugHitboxes() {
+      if (!this.debugMode || !this.debugGraphics) return;
+      this.debugGraphics.clear();
+      this.debugGraphics.lineStyle(2, 0xffff00, 1);
+      this.debugGraphics.strokeRect(
+        0,
+        PLAYFIELD_TOP,
+        W,
+        PLAY_BOTTOM - PLAYFIELD_TOP,
+      );
+      this.debugGraphics.lineStyle(2, 0x00ff66, 1);
+      this.debugGraphics.strokeCircle(this.player.x, this.player.y, 15);
+      this.obstacles.forEach((item) => {
+        this.getEnemyHitboxes(item).forEach((hitbox) => {
+          if (hitbox.type === "circle") {
+            this.debugGraphics.strokeCircle(
+              hitbox.shape.x,
+              hitbox.shape.y,
+              hitbox.shape.radius,
+            );
+          } else {
+            this.debugGraphics.strokeRectShape(hitbox.shape);
+          }
+        });
+      });
     }
 
     endGame(won) {
