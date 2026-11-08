@@ -244,15 +244,26 @@ body {
   .ad.is-started .logo,
   .ad.is-started .content,
   .ad.is-started .cta {
-    animation: none;
-    transition: none;
+    animation: none !important;
+    transition: none !important;
   }
 
   .background,
   .logo,
-  .content,
+  .content:not(.box),
   .cta,
   .headline {
+    opacity: 1;
+    transform: none;
+    scale: 1;
+  }
+
+  .content.box {
+    opacity: 0.9;
+    transform: none;
+  }
+
+  .top .content {
     opacity: 1;
     transform: none;
   }
@@ -261,7 +272,12 @@ body {
     transform: translateX(-50%);
   }
 
+  .ad.is-started:hover .cta {
+    scale: 1;
+  }
+
   .ad.is-started .cta {
-    transition: none;
+    animation: none !important;
+    transition: none !important;
   }
 }
