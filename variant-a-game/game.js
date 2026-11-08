@@ -690,7 +690,11 @@ import Phaser from "phaser";
     }
 
     clickout() {
-      window.open("https://example.com", "_blank", "noopener");
+      const clickTag =
+        new URLSearchParams(window.location.search).get("clickTag") ||
+        window.clickTag ||
+        "https://example.com/";
+      window.open(clickTag, "_blank", "noopener");
     }
 
     playSound(key, volume) {
