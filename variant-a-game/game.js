@@ -238,7 +238,7 @@
       if (this.pausedByVisibility || !pointer) return;
       if (this.mode === "start") {
         this.startGame();
-      } else if (this.mode === "playing") {
+      } else if (this.mode === "countdown" || this.mode === "playing") {
         this.jump();
       } else if (this.mode === "fail" && pointer.y > 530) {
         this.startGame();
@@ -249,10 +249,11 @@
 
     startGame() {
       this.clearStage();
-      this.mode = "playing";
+      this.mode = "countdown";
       this.score = 0;
       this.playerY = 350;
       this.velocity = 0;
+      this.countdownElapsed = 0;
       this.obstacles = [];
       this.addFull("bg");
       this.gut = this.add
@@ -276,6 +277,17 @@
       this.audio.loop = this.sound.add("loop", { loop: true, volume: 0.22 });
       this.playSound("loop");
       this.gameStart = this.time.now;
+      this.countdownLabel = this.add
+        .text(W / 2, H / 2, "3", {
+          fontFamily: "Arial Black, Arial, sans-serif",
+          fontSize: "60px",
+          color: "#ffffff",
+          stroke: "#091d4c",
+          strokeThickness: 8,
+          align: "center",
+        })
+        .setOrigin(0.5)
+        .setDepth(10);
     }
 
     makeObstacles() {
@@ -310,12 +322,22 @@
         this.updateStartPreview(delta);
         return;
       }
-      if (this.mode !== "playing" || this.pausedByVisibility) return;
+      if (
+        (this.mode !== "countdown" && this.mode !== "playing") ||
+        this.pausedByVisibility
+      )
+        return;
       const dt = Math.min(delta, 40) / 1000;
       this.velocity += 720 * dt;
       this.playerY += this.velocity * dt;
       this.player.y = this.playerY;
       this.player.angle = Phaser.Math.Clamp(this.velocity * 0.035, -18, 30);
+      if (this.playerY < PLAYFIELD_TOP + 22 || this.playerY > PLAY_BOTTOM - 30)
+        this.endGame(false);
+      if (this.mode === "countdown") {
+        this.updateCountdown(delta);
+        return;
+      }
       const speed = 132 * dt;
       const backgroundSpeed = 0.5 * speed;
       this.gut.x -= backgroundSpeed;
@@ -331,9 +353,33 @@
         if (this.fairHit(item)) this.endGame(false);
       });
       this.drawDebugHitboxes();
-      if (this.playerY < PLAYFIELD_TOP + 22 || this.playerY > PLAY_BOTTOM - 30)
-        this.endGame(false);
       if (this.score === this.obstacles.length) this.endGame(true);
+    }
+
+    updateCountdown(delta) {
+      this.countdownElapsed += delta;
+      const step =
+        this.countdownElapsed < 700
+          ? "3"
+          : this.countdownElapsed < 1400
+            ? "2"
+            : this.countdownElapsed < 2100
+              ? "1"
+              : "START";
+      if (step !== this.countdownLabel.text) {
+        this.countdownLabel.setText(step).setScale(0.7).setAlpha(1);
+        this.tweens.add({
+          targets: this.countdownLabel,
+          scale: 1,
+          duration: 220,
+          ease: "Back.out",
+        });
+      }
+      if (this.countdownElapsed >= 2700) {
+        this.countdownLabel.destroy();
+        this.countdownLabel = null;
+        this.mode = "playing";
+      }
     }
 
     updateStartPreview(delta) {
@@ -442,7 +488,7 @@
     }
 
     endGame(won) {
-      if (this.mode !== "playing") return;
+      if (this.mode !== "playing" && this.mode !== "countdown") return;
       this.mode = won ? "win" : "fail";
       this.stopLoop();
       if (won) {
