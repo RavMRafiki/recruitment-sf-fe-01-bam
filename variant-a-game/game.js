@@ -490,6 +490,16 @@
           delay: 420 + index * 90,
           ease: "Back.out",
         });
+        this.tweens.add({
+          targets: layer,
+          scaleX: layer.scaleX * 1.03,
+          scaleY: layer.scaleY * 1.03,
+          duration: 650,
+          delay: 1000 + index * 90,
+          yoyo: true,
+          repeat: -1,
+          ease: "Sine.inOut",
+        });
       });
     }
 
@@ -517,6 +527,16 @@
         duration: 650,
         delay: 360,
         ease: "Back.out",
+      });
+      this.tweens.add({
+        targets: cta,
+        scaleX: cta.scaleX * 1.03,
+        scaleY: cta.scaleY * 1.03,
+        duration: 650,
+        delay: 1100,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.inOut",
       });
     }
 
