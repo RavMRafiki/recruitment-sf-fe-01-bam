@@ -44,7 +44,7 @@ body {
   height: 975px;
   max-width: none;
   transform-origin: center;
-  background-image: url("assets/bg-big.jpg");
+  background-image: url("src/assets/bg-big.jpg");
   background-repeat: no-repeat;
   background-size: 1680px 975px;
 }
