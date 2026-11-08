@@ -179,10 +179,6 @@
         ease: "Back.out",
       });
       this.add
-        .rectangle(W / 2, 58, W, 1, 0x091d4c)
-        .setOrigin(0.5, 0)
-        .setDepth(2);
-      this.add
         .image(0, PLAY_TOP, "gameplay")
         .setOrigin(0, 0)
         .setDisplaySize(2528, 640)
@@ -658,6 +654,4 @@
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     scene: GutRun,
   });
-  // DEBUG:
-  window.game = game;
 })();
